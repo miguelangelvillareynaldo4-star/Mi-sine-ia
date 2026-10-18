@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17152b">
+<title>Mi Cine IA</title>
+<style>
+:root {
+  --fondo: #10101c;
+  --panel: #1c1b2d;
+  --morado: #9b87ff;
+  --texto: #f6f4ff;
+  --suave: #c2bfd7;
+  --borde: #39364f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, Arial, sans-serif;
+}
+header {
+  padding: 25px 18px;
+  background: linear-gradient(135deg,#28204d,#17152b);
+  border-bottom: 1px solid var(--borde);
+}
+header h1 { margin: 0 0 6px; font-size: 27px; }
+header p { margin: 0; color: var(--suave); }
+main { max-width: 760px; margin: auto; padding: 18px; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 15px;
+  padding: 17px;
+  margin-bottom: 16px;
+}
+h2 { font-size: 19px; margin: 0 0 15px; }
+label {
+  display: block;
+  font-size: 14px;
+  margin: 13px 0 6px;
+  color: var(--suave);
+}
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  background: #11111e;
+  color: white;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  font: inherit;
+}
+textarea { min-height: 90px; resize: vertical; }
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 14px;
+  background: var(--morado);
+  color: #17132c;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+button.secondary {
+  background: #302d47;
+  color: white;
+  border: 1px solid var(--borde);
+}
+button.danger { background: #512b3a; color: white; }
+.buttons { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 14px; }
+.scene {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--borde);
+}
+.scene:last-child { border-bottom: 0; }
+.scene h3 { font-size: 16px; margin: 0 0 8px; }
+small, .muted { color: var(--suave); }
+#status { color: #c5ffda; min-height: 22px; font-size: 13px; }
+footer { text-align: center; color: var(--suave); padding: 15px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 Mi Cine IA</h1>
+  <p>Tu estudio personal para crear películas y miniseries.</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>🎥 Mi proyecto</h2>
+
+    <label for="titulo">Nombre de la película o serie</label>
+    <input id="titulo" placeholder="Ej.: De Cuba a Curitiba">
+
+    <label for="genero">Género</label>
+    <select id="genero">
+      <option>Drama</option>
+      <option>Drama y traición</option>
+      <option>Aventura</option>
+      <option>Mitología y tradición</option>
+      <option>Comedia</option>
+      <option>Documental</option>
+      <option>Otro</option>
+    </select>
+
+    <label for="idea">¿De qué trata la historia?</label>
+    <textarea id="idea" placeholder="Cuenta aquí tu idea, los personajes y lo que les sucede..."></textarea>
+
+    <label for="protagonista">Protagonista</label>
+    <input id="protagonista" placeholder="Nombre, edad y apariencia">
+
+    <label for="estilo">Estilo visual</label>
+    <select id="estilo">
+      <option>Actores realistas, estilo cinematográfico</option>
+      <option>Documental realista</option>
+      <option>Animación</option>
+      <option>Fantasía cinematográfica</option>
+    </select>
+
+    <div class="buttons">
+      <button onclick="guardar()">💾 Guardar proyecto</button>
+      <button class="secondary" onclick="cargar()">📂 Recuperar proyecto</button>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="panel">
+    <h2>📝 Crear una escena</h2>
+
+    <label for="capitulo">Número y nombre del capítulo</label>
+    <input id="capitulo" placeholder="Ej.: Capítulo 1 — La despedida">
+
+    <label for="escena">Nombre de la escena</label>
+    <input id="escena" placeholder="Ej.: El muchacho sale de Cuba">
+
+    <label for="visual">¿Qué vemos en pantalla?</label>
+    <textarea id="visual" placeholder="Describe el lugar, el personaje, la luz y lo que sucede."></textarea>
+
+    <label for="dialogo">Narración o diálogos</label>
+    <textarea id="dialogo" placeholder="Escribe lo que dice el narrador o los personajes."></textarea>
+
+    <label for="duracion">Duración aproximada</label>
+    <select id="duracion">
+      <option>5 segundos</option>
+      <option selected>10 segundos</option>
+      <option>15 segundos</option>
+      <option>30 segundos</option>
+    </select>
+
+    <div class="buttons">
+      <button onclick="agregarEscena()">➕ Añadir escena</button>
+      <button class="secondary" onclick="crearPrompt()">✨ Preparar prompt</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>🎞️ Mis escenas</h2>
+    <div id="escenas"><p class="muted">Todavía no has añadido escenas.</p></div>
+    <div class="buttons">
+      <button onclick="exportar()">📥 Descargar guion</button>
+      <button class="secondary" onclick="copiarPrompt()">📋 Copiar prompt</button>
+      <button class="danger" onclick="borrarEscenas()">Borrar escenas</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>🤖 Instrucciones para generar video</h2>
+    <p class="muted">Preparamos una descripción para copiar en una herramienta de generación de video compatible.</p>
+    <textarea id="prompt" placeholder="Tu descripción para la IA aparecerá aquí." rows="8"></textarea>
+    <div class="buttons">
+      <button class="secondary" onclick="copiarPrompt()">Copiar descripción</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Mi Cine IA · Primera versión · Guarda una copia de tus guiones.
+</footer>
+
+<script>
+let escenas = [];
+
+function mensaje(texto) {
+  document.getElementById("status").textContent = texto;
+}
+
+function obtenerProyecto() {
+  return {
+    titulo: document.getElementById("titulo").value,
+    genero: document.getElementById("genero").value,
+    idea: document.getElementById("idea").value,
+    protagonista: document.getElementById("protagonista").value,
+    estilo: document.getElementById("estilo").value,
+    escenas: escenas
+  };
+}
+
+function guardar() {
+  try {
+    localStorage.setItem("miCineIA", JSON.stringify(obtenerProyecto()));
+    mensaje("Proyecto guardado en este navegador. ¡Buen trabajo!");
+  } catch (e) {
+    mensaje("No se pudo guardar. Descarga una copia del guion.");
+  }
+}
+
+function cargar() {
+  try {
+    const datos = JSON.parse(localStorage.getItem("miCineIA") || "null");
+    if (!datos) {
+      mensaje("Todavía no hay un proyecto guardado en este navegador.");
+      return;
+    }
+    document.getElementById("titulo").value = datos.titulo || "";
+    document.getElementById("genero").value = datos.genero || "Drama";
+    document.getElementById("idea").value = datos.idea || "";
+    document.getElementById("protagonista").value = datos.protagonista || "";
+    document.getElementById("estilo").value =
+      datos.estilo || "Actores realistas, estilo cinematográfico";
+    escenas = Array.isArray(datos.escenas) ? datos.escenas : [];
+    mostrarEscenas();
+    mensaje("Proyecto recuperado.");
+  } catch (e) {
+    mensaje("No se pudo recuperar el proyecto.");
+  }
+}
+
+function agregarEscena() {
+  const escena = {
+    capitulo: document.getElementById("capitulo").value.trim(),
+    nombre: document.getElementById("escena").value.trim(),
+    visual: document.getElementById("visual").value.trim(),
+    dialogo: document.getElementById("dialogo").value.trim(),
+    duracion: document.getElementById("duracion").value
+  };
+
+  if (!escena.nombre || !escena.visual) {
+    alert("Escribe el nombre de la escena y describe lo que vemos.");
+    return;
+  }
+
+  escenas.push(escena);
+  mostrarEscenas();
+  guardar();
+  document.getElementById("escena").value = "";
+  document.getElementById("visual").value = "";
+  document.getElementById("dialogo").value = "";
+  mensaje("Escena añadida y proyecto guardado.");
+}
+
+function mostrarEscenas() {
+  const contenedor = document.getElementById("escenas");
+  contenedor.replaceChildren();
+
+  if (!escenas.length) {
+    contenedor.innerHTML = '<p class="muted">Todavía no has añadido escenas.</p>';
+    return;
+  }
+
+  escenas.forEach((s, i) => {
+    const caja = document.createElement("div");
+    caja.className = "scene";
+    const titulo = document.createElement("h3");
+    titulo.textContent = (i + 1) + ". " + (s.nombre || "Escena");
+    const detalle = document.createElement("p");
+    detalle.textContent = (s.capitulo || "Sin capítulo") + " · " + s.duracion;
+    const visual = document.createElement("p");
+    visual.textContent = s.visual;
+    const dialogo = document.createElement("p");
+    dialogo.textContent = s.dialogo || "Sin diálogo todavía.";
+    caja.append(titulo, detalle, visual, dialogo);
+    contenedor.append(caja);
+  });
+}
+
+function crearPrompt() {
+  const p = obtenerProyecto();
+  const visual = document.getElementById("visual").value.trim();
+  const nombre = document.getElementById("escena").value.trim();
+  const dialogo = document.getElementById("dialogo").value.trim();
+  const duracion = document.getElementById("duracion").value;
+
+  if (!visual) {
+    alert("Primero describe lo que sucede en la escena.");
+    return;
+  }
+
+  const texto =
+    "Crea una escena de video de " + duracion + ". " +
+    "Proyecto: " + (p.titulo || "Sin título") + ". " +
+    "Género: " + p.genero + ". " +
+    "Estilo visual: " + p.estilo + ". " +
+    "Protagonista: " + (p.protagonista || "Según la descripción de la escena") + ". " +
+    "Escena: " + (nombre || "Sin título") + ". " +
+    "Descripción visual: " + visual + ". " +
+    "Diálogo o narración en español: " + (dialogo || "Sin diálogo") + ". " +
+    "Mantén la apariencia de los personajes consistente, con movimientos naturales, " +
+    "iluminación cinematográfica y sin texto escrito en pantalla.";
+
+  document.getElementById("prompt").value = texto;
+  mensaje("Descripción preparada. Puedes copiarla a una herramienta de video.");
+}
+
+async function copiarPrompt() {
+  const campo = document.getElementById("prompt");
+  if (!campo.value.trim()) {
+    crearPrompt();
+    if (!campo.value.trim()) return;
+  }
+  try {
+    await navigator.clipboard.writeText(campo.value);
+    mensaje("Descripción copiada.");
+  } catch (e) {
+    campo.focus();
+    campo.select();
+    mensaje("Selecciona el texto y pulsa Copiar en el menú del teléfono.");
+  }
+}
+
+function exportar() {
+  const p = obtenerProyecto();
+  let texto = "MI CINE IA\n\n";
+  texto += "Título: " + p.titulo + "\n";
+  texto += "Género: " + p.genero + "\n";
+  texto += "Idea: " + p.idea + "\n";
+  texto += "Protagonista: " + p.protagonista + "\n";
+  texto += "Estilo: " + p.estilo + "\n\n";
+
+  escenas.forEach((s, i) => {
+    texto += "ESCENA " + (i + 1) + "\n";
+    texto += "Capítulo: " + s.capitulo + "\n";
+    texto += "Nombre: " + s.nombre + "\n";
+    texto += "Duración: " + s.duracion + "\n";
+    texto += "Visual: " + s.visual + "\n";
+    texto += "Diálogo: " + s.dialogo + "\n\n";
+  });
+
+  const archivo = new Blob([texto], {type: "text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(archivo);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = "mi-guion.txt";
+  enlace.click();
+  URL.revokeObjectURL(url);
+  mensaje("Guion preparado para descargar.");
+}
+
+function borrarEscenas() {
+  if (!confirm("¿Seguro que quieres borrar todas las escenas?")) return;
+  escenas = [];
+  mostrarEscenas();
+  guardar();
+  mensaje("Se han borrado las escenas.");
+}
+
+cargar();
+</script>
+</body>
+</html>
